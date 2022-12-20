@@ -1,21 +1,18 @@
-#!/bin/bash
-#Name: header.sh
+#!/usr/bin/env
 
-##=== DATA ORGANIZATION ===##
+#' fix POPOOLATION2 output header into more legible format for downstream analysis
+#' @param all_headfix.fst tsv with all samples by population, with FST calculated by POPOOLATION2 (see popool.sh); population comparisons listed as 1:2, 1:3, 1:4, etc. (total of 9)
+#' @param file_header.tsv
+#' @export
 
-#Setting col names in R-----
-df <- read.table("all.fst", header=F)
+# Each data point is representated as 1:2=0.004 (or whatever FST is), and the "1:2=" should be removed before analysis
+# Finally, columns 1-5 contain data not necessary for analysis 
+
+df <- read.table("all2.fst", header=T)
+df[,6:281] <- apply(df[,6:X], 2, function(x) as.numeric(gsub('.*_','',x))) #function removes comparison numbers from values in rows 6-last
 names(df) <- lapply(df[1,], as.character) #sets first row as column names
-df2 <- gsub("_.*", "", colnames(df)) #removes everything after the "_"
-colnames(df) <- df2 #sets #:# as column names
-df3 <- subset(df, select=-c(1:5)) #remove non-fst values from dataframe
-
-#Setting col names in Unix (easier)----
-sed -i "1 s/.*/$(< file_header.tsv)/" all.fst #where file_header.tsv has been filled in with actual file names
-sed 's/=/_/g' all.fst > all2.fst #if you have the equals signs left over from FST replace them in the command line with underscores to make them easier to remove later
-
-#R data organization if you cheated using unix-----
-df <- read.table("all2.fst", header=T)=
-df[,6:281] <- apply(df[,6:X], 2, function(x) as.numeric(gsub('.*_','',x))) #function that removes the comparison numbers from values; just rows 6-last row (X)
+df <- gsub("_.*", "", colnames(df)) #removes everything after the "_"
+colnames(df) <- df #sets #:# as column names
+df <- subset(df, select=-c(1:5)) #remove non-fst values from dataframe
 df <- as.data.table(df)
-write.table(df, "fst_df", col.names=T, row.names=F, quote=F)
+write.table(df, "fst_df", col.names=T, row.names=F, quote=F, sep="\t")
