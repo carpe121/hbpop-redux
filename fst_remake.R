@@ -1,42 +1,36 @@
 #!/usr/bin/env
 
 #' generate statistical analyses and figures associated with genetic differentiation between US honey bee populations
-#' @param all.fst tsv with all samples by population, with FST calculated by POPOOLATION2 (see popool.sh); population comparisons listed as 1:2, 1:3, 1:4, etc. (total of 9); header fixed by header.sh
+#' @param fst_df tsv with all samples by population, with FST calculated by POPOOLATION2; header fixed by header.sh
 #' @param comp tsv with all comparisons listed by origin (Feral/Feral, Feral/Managed, or Managed/Managed)
-#' @examples for Unix command line
-#' $Rscript fst.R all.fst comp
+#' @examples for Unix command line: $Rscript fst.R fst_df comp
 #' @export
 
 #Load libraries--------------
-#if libraries do not load, uncomment next line:
-##install.packages(c("reshape2", "data.table", "dplyr"))
+#if libraries do not load, uncomment next line
+#install.packages(c("reshape2", "data.table", "dplyr", "ggplot2"))
 
-library(reshape2)
 library(data.table)
-library(ggplot2)
 library(dplyr)
+library(ggplot2)
+library(reshape2)
 
 print ("Libraries loaded")
 
-#Step 1: Reading and organization of data------------
+#Step 1: Reading in data------------
 args=commandArgs(trailingOnly=TRUE)
+df <- read.table(args[1], header=T)
 
-df <- read.table(args[1], header=F)
-
-names(df) <- lapply(df[1,], as.character) #sets first row as column names
-df2 <- gsub("_.*", "", colnames(df)) #removes everything after the "_"
-colnames(df) <- df2 #sets #:# as column names
-df3 <- subset(df, select=-c(1:5)) #remove non-fst values from dataframe
-
-print("Header reformatted")
+print("Data loaded")
 
 #Step 2: Calculating average FST per population----------
-mean <- colMeans(df3) #calculate column means
-mean.n0 <- apply(df3,2,function(x) mean(x[x>0])) #calculate column means and exclude zeros
+mean <- colMeans(df)
+mean.n0 <- apply(df,2,function(x) mean(x[x>0])) #calculate column means and exclude zeros
 comp <- read.table(args[2], header=F)
-df_means <- cbind(mean, mean.n0, comp) #make sure mean goes first to preserve rownames
+df_means <- cbind(mean, mean.n0, comp) #mean needs to go first to preserve rownames
 colnames(df_means) <- c("FST", "FST_n0", "comp")
-##OUTPUT TABLE HERE
+
+write.table(df_means, "avg_fst_tbl", col.names=T, sep="\t", row.names=F, quote=F)
 
 print("Average FST table printed")
 
@@ -74,14 +68,14 @@ tukey.plot <- TukeyHSD(x)
 plot(tukey.plot, las=1)
 
 #Avg FST Heatmap------
-mean.n0 <- as.data.frame(apply(df3,2,function(x) mean(x[x>0]))) #this one makes a table instead of a matrix like before
+mean.n0 <- as.data.frame(apply(df,2,function(x) mean(x[x>0]))) #constructs table
 mean.n0$names <- rownames(mean.n0)
 rownames(mean.n0) <- NULL
 colnames(mean.n0) <- c("FST", "Comp")
 mean.n0$Field1 <- gsub('[.].*','', mean.n0$Comp)
 mean.n0$Field2 <- gsub('.*[.]','', mean.n0$Comp)
 temp4 <- subset(mean.n0, select=-c(2))
-write.table(temp4, "fst_table", sep="\t", col.names=T, row.names=F, quote=F) #manually set values for fst
+write.table(temp4, "fst_table", sep="\t", col.names=T, row.names=F, quote=F)
 
 fst_list <- read.table("fst_table", header=T) 
 ggplot(fst_list, aes(Field1, Field2, fill=FST)) + geom_tile() + 
@@ -91,8 +85,7 @@ ggplot(fst_list, aes(Field1, Field2, fill=FST)) + geom_tile() +
 
 ## ===== GENOME-WIDE FST ====== ##
 #Manhattan plot------
-library(dplyr)
-library(ggplot2)
+
 df4 <- df[-grep("NW_", df$RefContig),] #removes unclassified pieces of genome for easier plotting
 df4 <- df4 %>%
   group_by(RefContig) %>%
