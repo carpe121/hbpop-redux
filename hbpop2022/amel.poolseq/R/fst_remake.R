@@ -37,7 +37,7 @@ pop2_fig <- function(popool2_fst) {
     geom_bar(stat="identity") + 
     theme_classic() +
     theme(legend.position="none",
-          axis.title.x=element_tok ext(color="black", size=15),
+          axis.title.x=element_text(color="black", size=15),
           axis.title.y=element_text(color="black", size=15)) +
     ylab("Average FST") + xlab("Stock") + 
     ggtitle("Average FST by Comparison") + theme(plot.title=element_text(hjust=0.5))
