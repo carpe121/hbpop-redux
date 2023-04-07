@@ -18,7 +18,7 @@ hbpop_gendiv(geneouts, id.txt, imm_genes, GB_GBold, GB_to_NCBI)
 \item{GB_to_NCBI}{data.frame of conversions from NCBI rna transcripts to GB}
 }
 \value{
-data.table and some plots
+data.frame and some plots
 }
 \description{
 generate figures associated with gendiv of US honey bee populations

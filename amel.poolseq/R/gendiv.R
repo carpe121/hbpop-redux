@@ -5,11 +5,10 @@
 #' @param imm_genes data.frame with GB IDs, gene function, and gene pathway
 #' @param GB_GBold data.frame of corresponding new and old GB names
 #' @param GB_to_NCBI data.frame of conversions from NCBI rna transcripts to GB
-#' @returns data.table and some plots
+#' @returns data.frame and some plots
 #' @import dplyr
 #' @import tidyr
 #' @import ggplot2
-#' @import data.table
 #' @examples set later 
 #' @export
 
@@ -96,7 +95,7 @@ hbpop_gendiv <- function(geneouts, id.txt, imm_genes, GB_GBold, GB_to_NCBI) {
   }
   #ok so basically this file looks at all the gene IDs and does a t-test between each pair of genes between managed and feral, outputting two files called gene.list (the names of all the genes) and gen.pval (p-value of each t-test). also it prints (in console) the names of every gene it's working on so you can see exactly when it stalls out.
 
-  all.pval.ns.gene <- as.data.frame(cbind(gene.list, as.numeric(as.character(gen.pval))))
+  all.pval.ns.gene <- data.frame(cbind(gene.list, as.numeric(as.character(gen.pval))))
   colnames(all.pval.ns.gene) <- c("gene", "pval") 
   all.pval.ns.gene <- all.pval.ns.gene[!(all.pval.ns.gene$pval=="NaN"),]
   all.pval.ns.gene$q <- qvalue1(all.pval.ns.gene2$pval)$q #but that's not all. also gotta calculate q-value to correct for false discovery rate because it's a lot of small prob calculations

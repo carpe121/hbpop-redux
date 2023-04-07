@@ -5,35 +5,31 @@
 #' @import dplyr
 #' @import ggplot2
 #' @import reshape2
+#' @returns several plots and figures
 #' @examples set later 
 #' @export
 
-pop2_fig <- function(popool2_fst) {
-  #Step 1: Fix input header---------
-  pop2_colnames(pop2names, popool2_fst)
+amel_popfig <- function(popool2_fst, comp) {
+  #Step 1: Alter input header---------
+  df <- amel_colnames(pop2names, popool2_fst)
 
-  #Step 2: Calculating average FST per population----------
+  #Step 2: Calculate mean FST per population----------
   mean <- colMeans(df)
-  mean.n0 <- apply(df,2,function(x) mean(x[x>0])) #calculate column means and exclude zeros
-  comp <- read.table(args[2], header=F)
-  df_means <- cbind(mean, mean.n0, comp) #mean needs to go first to preserve rownames
+  mean.n0 <- apply(df,2,function(x) mean(x[x>0])) #exclude zeros
+  df_means <- cbind(mean, mean.n0, comp)
   colnames(df_means) <- c("FST", "FST_n0", "comp")
+  #write.table(df_means, "amelpop_meanfst", col.names=T, sep="\t", row.names=F, quote=F)
 
-  write.table(df_means, "avg_fst_tbl", col.names=T, sep="\t", row.names=F, quote=F)
-
-  print("Average FST table printed")
-
-  #Step 3: Plot FST-----
+  #Step 3: Aggregate mean FST by comparison class and plot-----
   df_means <- subset(df_means, select=-c(1))
   df_means$stock <- rownames(df_means)
   rownames(df_means) <- NULL
-  new.df_means <- df_means[order(df_means$FST_n0),]
+  df_means2 <- df_means[order(df_means$FST_n0),]
 
-  #Plot by aggregating avg. FST by comparison class----
-  u <- aggregate(new.df_means$FST_n0, by=list(new.df_means$comp), function(x) mean(x, na.rm=TRUE))
-  colnames(u) <- c("Comparison", "FST")
+  df_fstag <- aggregate(df_means2$FST_n0, by=list(df_means2$comp), function(x) mean(x, na.rm=TRUE))
+  colnames(df_fstag) <- c("Comparison", "FST")
 
-  new.plot2 <- ggplot(data=u, aes(x=Comparison, y=FST, fill=Comparison)) + 
+  ampop_avfst <- ggplot(data=df_fstag, aes(x=Comparison, y=FST, fill=Comparison)) + 
     geom_bar(stat="identity") + 
     theme_classic() +
     theme(legend.position="none",
@@ -41,20 +37,15 @@ pop2_fig <- function(popool2_fst) {
           axis.title.y=element_text(color="black", size=15)) +
     ylab("Average FST") + xlab("Stock") + 
     ggtitle("Average FST by Comparison") + theme(plot.title=element_text(hjust=0.5))
-  p <- new.plot2+scale_fill_brewer(palette="Dark2")
-
-  p <- new.plot2+scale_color_manual(values=c("#4D1434", "#903163", "#969FA7"))
-
-  #OUTPUT FIGURE HERE
-
-  print("Average FST plot generated")
+  ampop_avfst <- ampop_avfst + scale_color_manual(values=c("#4D1434", "#903163", "#969FA7"))
+  #png('output/ampop_avfst')
 
   #ANOVA------
-  temp <- temp[-grep("Ref", df$Field1),]
-  x <- aov(temp$FST_n0~temp$comp)
-  summary(x)
-  tukey.plot <- TukeyHSD(x)
-  plot(tukey.plot, las=1)
+  df_means <- df_means[-grep("Ref", df$Field1),]
+  df_aov <- aov(df_means$FST_n0~df_means$comp)
+  summary(df_aov)
+  df_tukey <- TukeyHSD(df_aov)
+  plot(df_tukey, las=1)
 
   #Avg FST Heatmap------
   mean.n0 <- data.frame(apply(df,2,function(x) mean(x[x>0]))) #constructs table
@@ -63,11 +54,11 @@ pop2_fig <- function(popool2_fst) {
   colnames(mean.n0) <- c("FST", "Comp")
   mean.n0$Field1 <- gsub('[.].*','', mean.n0$Comp)
   mean.n0$Field2 <- gsub('.*[.]','', mean.n0$Comp)
-  temp4 <- subset(mean.n0, select=-c(2))
-  write.table(temp4, "fst_table", sep="\t", col.names=T, row.names=F, quote=F)
+  mean.n0_2 <- subset(mean.n0, select=-c(2))
+  #write.table(mean.n0_2, "fst_table", sep="\t", col.names=T, row.names=F, quote=F)
+  #fst_list <- read.table("fst_table", header=T) 
 
-  fst_list <- read.table("fst_table", header=T) 
-  ggplot(fst_list, aes(Field1, Field2, fill=FST)) + geom_tile() + 
+  ggplot(mean.n0_2, aes(Field1, Field2, fill=FST)) + geom_tile() + 
     geom_text(aes(label=sprintf("%.3f", FST)), color="white", size=4) +
     labs(x=NULL, y=NULL) +
     coord_fixed() + theme_bw()
@@ -75,19 +66,19 @@ pop2_fig <- function(popool2_fst) {
   ## ===== GENOME-WIDE FST ====== ##
   #Manhattan plot------
 
-  df4 <- df[-grep("NW_", df$RefContig),] #removes unclassified pieces of genome for easier plotting
-  df4 <- df4 %>%
+  ampop_mhdf <- df[-grep("NW_", df$RefContig),] #removes unclassified pieces of genome for easier plotting
+  ampop_mhdf <- ampop_mhdf %>%
     group_by(RefContig) %>%
     summarize(chr_len=max(WindowPos)) %>%
     mutate(tot=cumsum(chr_len)-chr_len) %>%
     select(-chr_len) %>%
-    left_join(df4, ., by=c("RefContig"="RefContig")) %>%
+    left_join(ampop_mhdf, ., by=c("RefContig"="RefContig")) %>%
     arrange(RefContig, WindowPos) %>%
     mutate(BPcum=WindowPos+tot)
 
-  axisdf = df4 %>% group_by(RefContig) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
+  axisdf = ampop_mhdf %>% group_by(RefContig) %>% summarize(center=( max(BPcum) + min(BPcum) ) / 2 )
 
-  p <- ggplot(df4, aes(x=BPcum, y=df4[,7])) +
+  ampop_manplot <- ggplot(ampop_mhdf, aes(x=BPcum, y=df4[,7])) +
     geom_point( aes(color=as.factor(RefContig)), alpha=0.8, size=1.3) +
     scale_color_manual(values = rep(c("grey", "skyblue"), 70 )) +
     scale_x_continuous( label = axisdf$RefContig, breaks= axisdf$center ) +
@@ -100,5 +91,12 @@ pop2_fig <- function(popool2_fst) {
       panel.grid.minor.x = element_blank()
     )
 
-  p + facet_wrap(~RefContig, scales="free")
+  ampop_manplot + facet_wrap(~RefContig, scales="free")
 }
+
+
+
+
+
+
+

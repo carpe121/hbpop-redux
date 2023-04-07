@@ -9,10 +9,7 @@ hbpop_admix(plink3, temp)
 \arguments{
 \item{plink3}{.plink created by ADMIXTURE}
 
-\item{temp}{tsv with population names}
-}
-\value{
-figure(s)
+\item{temp}{data.frame with population names}
 }
 \description{
 generate figures associated with admixture of US honey bee populations
