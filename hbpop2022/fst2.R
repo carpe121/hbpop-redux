@@ -14,7 +14,7 @@ sed -i "1 s/.*/$(< file_header.tsv)/" all.fst #where file_header.tsv has been fi
 sed 's/=/_/g' all.fst > all2.fst #if you have the equals signs left over from FST replace them in the command line with underscores to make them easier to remove later
 
 #R data organization if you cheated using unix-----
-df <- read.table("all2.fst", header=T)=
+df <- read.table("all2.fst", header=T)
 df[,6:281] <- apply(df[,6:X], 2, function(x) as.numeric(gsub('.*_','',x))) #function that removes the comparison numbers from values; just rows 6-last row (X)
 df <- as.data.table(df)
 write.table(df, "fst_df", col.names=T, row.names=F, quote=F)

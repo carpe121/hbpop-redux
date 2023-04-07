@@ -3,6 +3,10 @@
 #' generate statistical analyses and figures associated with genetic differentiation between US honey bee populations
 #' @param fst_df tsv with all samples by population, with FST calculated by POPOOLATION2; header fixed by header.sh
 #' @param comp tsv with all comparisons listed by origin (Feral/Feral, Feral/Managed, or Managed/Managed)
+#' @import data.table
+#' @import dplyr
+#' @import ggplot2
+#' @import reshape2
 #' @examples for Unix command line: $Rscript fst.R fst_df comp
 #' @export
 
