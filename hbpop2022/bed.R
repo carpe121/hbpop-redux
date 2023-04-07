@@ -1,3 +1,14 @@
+#HBPOP2022 FST figures.....now with genes
+#' generate figures associated with FST on gene level of US honey bee populations
+#' @param fst_df created by fst_remake.R 
+#' @returns data.table
+#' @importFrom reshape2 melt
+#' @examples set later 
+#' @export
+
+
+
+
 #!/usr/bin/env
 
 #' script that converts to fst output into something that can be run through bedtools

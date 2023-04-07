@@ -1,6 +1,13 @@
-##=== PCA ===##
-library(data.table)
-library(pcadapt)
+#HBPOP2022 Admixture PCA
+#' generate PCA based on admixture of US honey bee populations
+#' @param plink_2.bed .plink created by ADMIXTURE
+#' @param stockname list of stock names
+#' @param pca_rn.txt data.frame single column file that has stock corresponding to the row
+#' @returns figure pca_hbpop2022_admix
+#' @import ggplot2
+#' @importFrom pcadapt read.pcadapt
+#' @examples set later 
+#' @export
 
 #BED file---------
 file <- read.pcadapt("plink_2.bed", type="bed")
@@ -11,7 +18,7 @@ poplist <- c(rep("STOCKNAME", no. of samples in that stock), rep(repeat as necce
 plot(x, option="scores", pop=poplist)
 
 df <- subset(data.frame(x$scores), select=c(1,2)) #pulls out the first two PCs
-rn <- read.table("pca_rn.txt", header=F) #single column text file that has stock corresponding to the row
+rn <- read.table("pca_rn.txt", header=F)
 df$Stock <- rn$V1
 write.table(df, "pca_table", row.names=F, col.names=T, quote=F)
 

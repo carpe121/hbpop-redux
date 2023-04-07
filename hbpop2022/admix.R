@@ -1,3 +1,14 @@
+#HBPOP2022 Admixture figures
+#' generate figures associated with admixture of US honey bee populations
+#' @param plink3 .plink created by ADMIXTURE
+#' @param temp tsv with population names
+#' @returns figure(s)
+#' @import ggplot2
+#' @examples set later 
+#' @export
+
+
+
 ## ========= ADMIXTURE =========== ##
 
 #organize table-----
