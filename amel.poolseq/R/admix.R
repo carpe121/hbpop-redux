@@ -51,4 +51,5 @@ hbpop_admix <- function(plink3, temp){
   p <- ggplot(sort.tbl, aes(x=Pop, y=M)) + geom_boxplot(fill='#A29F9E', color="black") + 
     labs(x="Management", y="Proportion") + coord_cartesian(ylim=c(0,1)) + 
     theme_classic()
-  }
+
+}

@@ -4,12 +4,12 @@
 \alias{hbpop_pca}
 \title{generate PCA based on admixture of US honey bee populations}
 \usage{
-hbpop_pca(plink_2.bed, stockname, pca_rn.txt)
+hbpop_pca(plink_2.bed, popnames, pca_rn.txt)
 }
 \arguments{
 \item{plink_2.bed}{.plink created by ADMIXTURE}
 
-\item{stockname}{list of stock names}
+\item{popnames}{list of sample names and their population}
 
 \item{pca_rn.txt}{data.frame single column file that has stock corresponding to the row}
 }

@@ -4,12 +4,10 @@
 \alias{amel_popfig}
 \title{generate statistical analyses and figures associated with genetic differentiation between US honey bee populations}
 \usage{
-amel_popfig(popool2_fst, comp)
+amel_popfig(popool2_fst)
 }
 \arguments{
 \item{popool2_fst}{.fst created by popoolation2 fst-sliding.pl}
-
-\item{comp}{tsv with all comparisons listed by origin (Feral/Feral, Feral/Managed, or Managed/Managed)}
 }
 \value{
 several plots and figures

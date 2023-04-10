@@ -2,7 +2,7 @@
 #' generate figures associated with FST on gene level of US honey bee populations
 #' @param fst_df data.frame created by amel_popfig
 #' @param n_percent number n% (1-100) of FST from top, e.g. n_percent=10 gives top 10%
-#' @param pop_table data.frame mapping each comparison (e.g. PurdueMB:PAFeral; header="Comparison") to class (e.g. Managed/Feral; header="Type")
+#' @param pop_table data.frame mapping each comparison (e.g. PurdueMB:PAFeral; header="Comparison") to class (e.g. Managed/Feral; header="Type") 
 #' @importFrom reshape2 melt
 #' @return data.table
 #' @examples set later 

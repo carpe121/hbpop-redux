@@ -1,7 +1,6 @@
 #HBPOP2022 POPOOLATION2 Fst figures
 #' generate statistical analyses and figures associated with genetic differentiation between US honey bee populations
 #' @param popool2_fst .fst created by popoolation2 fst-sliding.pl
-#' @param comp tsv with all comparisons listed by origin (Feral/Feral, Feral/Managed, or Managed/Managed)
 #' @import dplyr
 #' @import ggplot2
 #' @import reshape2
@@ -9,14 +8,14 @@
 #' @examples set later 
 #' @export
 
-amel_popfig <- function(popool2_fst, comp) {
+amel_popfig <- function(popool2_fst) {
   #Step 1: Alter input header---------
   df <- amel_colnames(pop2names, popool2_fst)
 
   #Step 2: Calculate mean FST per population----------
-  mean <- colMeans(df)
+  mean <- colMeans(df[[1]])
   mean.n0 <- apply(df,2,function(x) mean(x[x>0])) #exclude zeros
-  df_means <- cbind(mean, mean.n0, comp)
+  df_means <- cbind(mean, mean.n0, df[[2]])
   colnames(df_means) <- c("FST", "FST_n0", "comp")
   #write.table(df_means, "amelpop_meanfst", col.names=T, sep="\t", row.names=F, quote=F)
 
