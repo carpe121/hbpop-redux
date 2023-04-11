@@ -8,9 +8,11 @@ REWRITTEN code written for M. Carpenter's Master's thesis (May 2022)
 ## amel.poolseq
 `amel.poolseq` is a folder containing an R package (amel.poolseq) with functions used to generate figures and dataframes. `amel.poolseq` uses R command line (>= 4.1.0).
 
-You must provide a csv, tsv, or txt file with at least two columns. The first column must be the sample name, and additional columns can be population names or other ways to group the samples (e.g. population, management style). If you are using functions made for use with POPOOLATION2, you *must* order the sample names in the same order they were added to the POPOOLATION2 mpileup file. Otherwise, they can be in any order. 
+You must provide a csv, tsv, or txt file (`popnames`) with at least two columns. The first column must be the sample name, and additional columns can be population names or other ways to group the samples (e.g. population, management style). If you are using functions made for use with POPOOLATION2, you *must* order the sample names in the same order they were added to the POPOOLATION2 mpileup file. Otherwise, they can be in any order. 
 
 ### Example Dataframe
-AHB_3829 | Feral | AHB
-Scranton-LBG | Feral | PAFeral
-P02 | Managed | PurdueMB
+|Sample | Management | Population |
+|------ | ---------- | ---------- |
+|AHB_3829 | Feral | AHB|
+|Scranton-LBG | Feral | PAFeral|
+|P02 | Managed | PurdueMB|
