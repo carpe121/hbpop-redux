@@ -1,0 +1,68 @@
+---
+title: "amelpool_admix"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{amelpool_admix}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(amel.poolseq)
+library(ggplot2)
+```
+
+# ADMIXTURE Analysis
+
+This vignette generates figures associated with admixture of US honey bee populations.
+
+## Organize ADMIXTURE output
+```{r}
+plink3 <- read.table("plink.3.Q", header=F)
+colnames(plink3) <- c("A", "M", "C") #pooled sequences from ancestral population
+temp <- read.table("pca_rn.txt", header=T) #data.frame with population names
+plink3 <- cbind(plink3,temp)
+plink3 <- plink3[-c(66,67,68), ] #get rid of reference samples; DROP REFERENCE BY VALUE, not POSITION
+```
+
+## Average Ancestry per Population
+Average ancestry by population and standard deviation.
+```{r}
+hbpop_admix(plink3)
+```
+
+### Boxplot of ancestry by stock -> loop
+```{r echo=FALSE}
+sort.tbl <- with(plink3, plink3[order(plink3$Pop),]) #sort alphabetically by stock
+ggplot(sort.tbl, aes(x=Pop, y=M)) + geom_boxplot(fill='#A29F9E', color="black") + 
+labs(x="Management", y="Proportion") + coord_cartesian(ylim=c(0,1)) + 
+theme_classic()
+```
+
+### Statistical significance -> loop
+```{r}
+  x <- aov(plink3$C~plink3$Management, data=plink3)
+  TukeyHSD(x)
+  x <- aov(plink3$M~plink3$Management, data=plink3)
+```
+
+## Produce Figure X: Ancestry by Pooled Sample
+The dotted line represented in the figure represents the ancestry contribution at which AHB ancestry is reliably detectable.
+
+```{r echo=FALSE}
+plot.tbl <- subset(sort.tbl, select=-c(4,5)) #get rid of pop and management cols for plot
+anc.plot <- barplot(t(as.matrix(plot.tbl)), 
+                col=c("red", "black", "yellow"), 
+                xlab="Sample", las=2,
+                ylab="Ancestry", 
+                legend=c("A", "M", "C"),
+                args.legend=list(title="Ancestry", x="topright"))
+abline(h=0.2, col="blue", lty=c(2), lwd=c(5))
+```

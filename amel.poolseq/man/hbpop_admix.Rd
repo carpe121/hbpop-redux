@@ -2,17 +2,15 @@
 % Please edit documentation in R/admix.R
 \name{hbpop_admix}
 \alias{hbpop_admix}
-\title{generate figures associated with admixture of US honey bee populations}
+\title{for each ancestral population, calculate average contribution and standard deviation for each sample}
 \usage{
-hbpop_admix(plink3, temp)
+hbpop_admix(plink3)
 }
 \arguments{
 \item{plink3}{.plink created by ADMIXTURE}
-
-\item{temp}{data.frame with population names}
 }
 \description{
-generate figures associated with admixture of US honey bee populations
+for each ancestral population, calculate average contribution and standard deviation for each sample
 }
 \examples{
 set later 

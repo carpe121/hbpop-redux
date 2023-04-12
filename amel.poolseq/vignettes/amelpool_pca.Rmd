@@ -1,0 +1,50 @@
+---
+title: "amelpool_pca"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{amelpool_pca}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(amel.poolseq)
+library(pcadapt)
+```
+
+# PCA
+
+## File Organization
+Read in plink_2.bed (plink file created by ADMIXTURE) and pca_rn.txt (data.frame single column file that has stock corresponding to the row -> change to popnames).
+
+```{r}
+  file <- read.pcadapt("plink_2.bed", type="bed")
+  rn <- read.table("pca_rn.txt", header=F)
+  x <- pcadapt(input=file, K=20)
+  plot1 <- plot(x, option="screeplot")
+```
+
+## Data Organization
+```{r}
+  #poplist <- c(rep("STOCKNAME", no. of samples in that stock), rep(repeat as neccessary))
+  plot2 <- plot(x, option="scores", pop=unique(popnames[,2]))
+  df <- subset(data.frame(x$scores), select=c(1,2)) #pulls out the first two PCs
+  df$Stock <- rn$V1
+```
+
+## Plot PCA
+```{r echo=FALSE}
+ggplot(df, aes(x=X1, y=X2, shape=Stock, color=Stock)) + 
+  geom_point(size=5) +
+  scale_shape_manual(values=c(17,16,16,16,17,17,17,17,17)) +
+  scale_color_manual(values=c('#332288', '#117733', '#DDCC77', '#882255', '#44AA99', '#CC6677', '#AA4499', '#882255', '#88CCEE')) +
+  labs(x="PC2 (14.1%)", y="PC1 (15.4%)", title="PCA") +
+  theme_bw()
+```
