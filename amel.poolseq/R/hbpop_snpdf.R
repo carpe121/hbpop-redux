@@ -4,7 +4,6 @@
 #' @param popnames text file with sample names in column 1 and population categories in columns 2:#
 #' @return data.frame of merged datasets
 #' @import dplyr
-#' @importFrom wrapr coalesce
 #' @examples tbd
 #' @export
 
@@ -14,13 +13,5 @@ hbpop_snpdf <- function(snp_gen_out, popnames) {
   snp_gen_out$NS <- snp_gen_out$piN/snp_gen_out$piS
   snp_gen_out <- na.rm(snp_gen_out)
   snp_gen_out <- snp_gen_out[!is.infinite(snp_gen_out$NS),]
-
-  data(gb_ncbi)
-  data(gb_gbo)
-  gb_gbo$comb <- gb_gbo$GBold %?% gb_gbo$GB
-  gb_ncbi_comb <- merge(gb_gbo, gb_ncbi, by.x="comb", by.y="Gene", all.y=TRUE)
-  gb_ncbi_comb <- select(gb_ncbi_comb, -GBold)
-  gb_ncbi_fin <- gb_ncbi_comb[!(gb_ncbi_comb$comb==""),]
-
-  merge(popnames, merge(gb_ncbi_fin, snp_gen_out, by.x="transcript", by.y="product"))
+  merge(popnames, merge(data(gb_ncbi_fin), snp_gen_out, by.x="transcript", by.y="product"))
 }
