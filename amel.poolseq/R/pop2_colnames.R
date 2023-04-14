@@ -2,6 +2,7 @@
 #' removes non-fst columns and numeric population colnames from fst estimates; sets colnames to population names
 #' @param popnames list of sample names IN THE ORDER THEY WERE ADDED TO MPILEUP and their population
 #' @param popool_fst data.frame .fst output created by popoolation2 fst-sliding.pl
+#' @importFrom utils combn
 #' @return data.frame (2) popool_fst2, amel_fst_df
 #' @examples
 #' ex_pop2names <- data.frame(X1=c("AHB_3829", "Scranton-LBG", "P02"), X2=c("Feral","Feral","Managed"), X3=c("AHB", "PAFeral", "PurdueMB"))

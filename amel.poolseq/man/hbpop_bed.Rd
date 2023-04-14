@@ -10,8 +10,6 @@ hbpop_bed(fst_df, n_percent)
 \item{fst_df}{data.frame created by amel_popfig}
 
 \item{n_percent}{number n\% (1-100) of FST from top, e.g. n_percent=10 gives top 10\%}
-
-\item{pop_table}{data.frame mapping each comparison (e.g. PurdueMB:PAFeral; header="Comparison") to class (e.g. Managed/Feral; header="Type")}
 }
 \value{
 data.table

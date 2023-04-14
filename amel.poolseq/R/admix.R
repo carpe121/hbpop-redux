@@ -1,6 +1,8 @@
 #HBPOP2022 Admixture figures
 #' for each ancestral population, calculate average contribution and standard deviation for each sample
 #' @param plink3 .plink created by ADMIXTURE
+#' @importFrom stats aggregate
+#' @importFrom stats sd
 #' @examples set later 
 #' @export
 

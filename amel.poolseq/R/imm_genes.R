@@ -1,0 +1,17 @@
+#' A. mellifera Immune Genes
+#'
+#' A dataset of A. mellifera genes linked to immune function and behavior
+#' 
+#' @format ## `imm_genes`
+#' A data frame with 3 columns and 300 rows:
+#' \describe{
+#'	\item{GB}{Apis mellifera GenBank ID}
+#'	\item{GeneName}{name of gene}
+#'	\item{GenePathway}{name of associated pathway if known}
+#' }
+#' @source assembled from 
+#' Brutscher, L. M., Daughenbaugh, K. F., & Flenniken, M. L. (2015). Antiviral defense mechanisms in honey bees. Current opinion in insect science, 10, 71-82.
+#' Evans, J. D., Aronstein, K., Chen, Y. P., Hetru, C., Imler, J. L., Jiang, H., Kanost, M., Thompson, G. J., Zou, Z., & Hultmark, D. (2006). Immune pathways and defence mechanisms in honey bees Apis mellifera. Insect molecular biology, 15(5), 645–656. https://doi.org/10.1111/j.1365-2583.2006.00682.x
+#' Harpur, B. A., Guarna, M. M., Huxter, E., Higo, H., Moon, K. M., Hoover, S. E., ... & Zayed, A. (2019). Integrative genomics reveals the genetics and evolution of the honey bee’s social immune system. Genome Biology and Evolution, 11(3), 937-948.
+
+"imm_genes"

@@ -2,8 +2,9 @@
 #' generate figures associated with FST on gene level of US honey bee populations
 #' @param fst_df data.frame created by amel_popfig
 #' @param n_percent number n% (1-100) of FST from top, e.g. n_percent=10 gives top 10%
-#' @param pop_table data.frame mapping each comparison (e.g. PurdueMB:PAFeral; header="Comparison") to class (e.g. Managed/Feral; header="Type") 
+#' @import dplyr 
 #' @importFrom reshape2 melt
+#' @importFrom stats quantile
 #' @return data.table
 #' @examples set later 
 #' @export
@@ -12,6 +13,8 @@ hbpop_bed <- function(fst_df, n_percent) {
     #Sort FST by Comparison Class-------
     ampop_mhdf$Comb <- paste(ampop_mhdf$RefContig, ampop_mhdf$WindowPos)
     ampop_melt <- reshape2::melt(ampop_mhdf, id.vars="Comb", measure.vars=c("Managed/Managed", "Feral/Managed", "Feral/Feral"))
+    #rewrite to integrate FST df -> use output from fst table to avoid previous line
+    #pop_table = data.frame mapping each comparison (e.g. PurdueMB:PAFeral; header="Comparison") to class (e.g. Managed/Feral; header="Type") 
     ampop_melt$Chrom <- gsub(' .*','', ampop_melt$Comb)
     ampop_melt$WindowPos <- gsub('.* ','', ampop_melt$Comb)
     ampop_melt$Comb <- NULL
@@ -20,7 +23,7 @@ hbpop_bed <- function(fst_df, n_percent) {
     
     #Write BED file output------
     fm_fst <- ampop_bedsort[which(ampop_bedsort$Type=='Feral/Managed'),] #for example; just change type to Feral/Managed or Managed/Managed -> LOOP? for each unique(ampop_bedsort$Type)
-    fm_fst <- fm_fst %>% arrange(desc(FST))
+    fm_fst <- fm_fst %>% arrange(desc(fm_fst$FST))
     bed_out <- fm_fst[fm_fst$FST > quantile(fm_fst$FST,prob=1-n_percent/100),]
     bed_out$Comb <- paste(bed_out$Chrom, bed_out$WindowPos) #gotta combine chrom and window pos to get unique SNPs
         #x <- data.frame(unique(top5$Comb)) #gives you number of unique SNPs

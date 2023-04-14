@@ -16,5 +16,5 @@ data.frame
 analyzes individual genes for differences in genetic diversity
 }
 \examples{
-set later 
+tbd
 }
