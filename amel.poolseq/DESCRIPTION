@@ -1,6 +1,6 @@
 Package: amel.poolseq
 Title: Apis mellifera Pooled Sequencing Package
-Version: 1.0.4
+Version: 1.0.5
 Authors@R: 
     person("Madeline", "Carpenter", , "remcr@channing.harvard.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000000"))

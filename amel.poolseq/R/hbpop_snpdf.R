@@ -13,5 +13,5 @@ hbpop_snpdf <- function(snp_gen_out, popnames) {
   snp_gen_out$NS <- snp_gen_out$piN/snp_gen_out$piS
   snp_gen_out <- na.rm(snp_gen_out)
   snp_gen_out <- snp_gen_out[!is.infinite(snp_gen_out$NS),]
-  merge(popnames, merge(data(gb_ncbi_fin), snp_gen_out, by.x="transcript", by.y="product"))
+  merge(popnames, merge(data(gb_ncbi_conv), snp_gen_out, by.x="Transcript", by.y="product"))
 }
