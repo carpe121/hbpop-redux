@@ -24,19 +24,29 @@ library(ggplot2)
 
 This vignette generates figures associated with admixture of US honey bee populations.
 
+`pca_rn.txt` is a data.frame with the sample names for each row. It also includes samples from reference populations (from Harpur (2019)), which are noted as "Ref". The reference samples were needed to train the ADMIXTURE model.
+
 ## Organize ADMIXTURE output
 ```{r}
 plink3 <- read.table("plink.3.Q", header=F)
-colnames(plink3) <- c("A", "M", "C") #pooled sequences from ancestral population
-temp <- read.table("pca_rn.txt", header=T) #data.frame with population names
-pop_plink <- cbind(plink3,temp)
+colnames(plink3) <- c("A", "M", "C")
+sampnames <- read.table("pca_rn.txt", header=T)
+pop_plink <- cbind(plink3,sampnames)
 pop_plink <- pop_plink[-grep("Ref", pop_plink$Management),]
 ```
 
-## Average Ancestry per Population
-Average ancestry by population and standard deviation.
+## Average Ancestry by Management
+Average ancestry and standard deviation, sorted by management.
 ```{r}
-hbpop_admix <- pop_plink %>% group_by(Management) %>%
+hbman_admix <- pop_plink %>% group_by(Management) %>%
+  summarize(avgA=mean(A), sdA=sd(A),
+    avgC=mean(C), sdC=sd(C),
+    avgM=mean(M), sdM=sd(M))
+```
+
+## Average Ancestry by Stock
+```{r}
+hbstock_admix <- pop_plink %>% group_by(Pop) %>%
   summarize(avgA=mean(A), sdA=sd(A),
     avgC=mean(C), sdC=sd(C),
     avgM=mean(M), sdM=sd(M))
@@ -44,7 +54,7 @@ hbpop_admix <- pop_plink %>% group_by(Management) %>%
 
 ### Boxplot of ancestry by stock -> loop
 ```{r echo=FALSE}
-sort.tbl <- with(pop_plink, pop_plink[order(pop_plink$Pop),]) #sort alphabetically by stock
+sort.tbl <- with(pop_plink, pop_plink[order(pop_plink$Pop),])
 ggplot(sort.tbl, aes(x=Pop, y=M)) + geom_boxplot(fill='#A29F9E', color="black") + 
 labs(x="Management", y="Proportion") + coord_cartesian(ylim=c(0,1)) + 
 theme_classic()
@@ -52,12 +62,44 @@ theme_classic()
 
 ### Statistical significance -> loop
 ```{r}
+
+mg_name <- unique(pop_plink$Management)
+pop_name <- c("A", "C", "M")
+
+for(i in 1:length(mg_name)){
+  print(i)
+  for(x in 1:length(pop_name)){
+    c_aov <- aov(pop_plink$x~pop_plink$i, data=pop_plink)
+    TukeyHSD(c_aov)
+  }
+}
+
+
+pop_name <- data.frame(c("A", "C", "M"))
+for(i in 1:length(pop_name)){
+    c_aov <- aov(pop_plink$i~pop_plink$Feral, data=pop_plink)
+    TukeyHSD(c_aov)
+    print(c_aov)
+  }
+
+
+for(i in 1:length(pop_name)){ 
+  test <- pop_name[i]
+  c_aov <- aov(pop_plink$test~pop_plink$Feral, data=pop_plink) 
+}
+
+
+
   x <- aov(pop_plink$C~pop_plink$Management, data=pop_plink)
   TukeyHSD(x)
   x <- aov(pop_plink$M~pop_plink$Management, data=pop_plink)
 ```
 
 ## Produce Figure X: Ancestry by Pooled Sample
+
+
+
+
 The dotted line represented in the figure represents the ancestry contribution at which AHB ancestry is reliably detectable.
 
 ```{r echo=FALSE}
