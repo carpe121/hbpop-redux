@@ -55,9 +55,16 @@ hbstock_admix <- pop_plink %>% group_by(Pop) %>%
 ### Boxplot of ancestry by stock -> loop
 ```{r echo=FALSE}
 sort.tbl <- with(pop_plink, pop_plink[order(pop_plink$Pop),])
-ggplot(sort.tbl, aes(x=Pop, y=M)) + geom_boxplot(fill='#A29F9E', color="black") + 
-labs(x="Management", y="Proportion") + coord_cartesian(ylim=c(0,1)) + 
-theme_classic()
+amelplot <- function(popname, fill_col){
+  p <- ggplot(sort.tbl, aes(x=Pop, y={{popname}})) + geom_boxplot(fill=fill_col, color="black") + coord_cartesian(ylim=c(0,1))
+  p + ggtitle("Ancestry by Management") + xlab("Management") + ylab("Proportion")
+  p + theme(text=element_text(size=15)) + theme_bw()
+}
+
+
+amelplot(M, '#CD9600')
+#yellow is #CD9600
+#red is #FF0000
 ```
 
 ### Statistical significance -> loop
@@ -96,9 +103,6 @@ for(i in 1:length(pop_name)){
 ```
 
 ## Produce Figure X: Ancestry by Pooled Sample
-
-
-
 
 The dotted line represented in the figure represents the ancestry contribution at which AHB ancestry is reliably detectable.
 
