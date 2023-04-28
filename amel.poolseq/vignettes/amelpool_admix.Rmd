@@ -55,48 +55,15 @@ hbstock_admix <- pop_plink %>% group_by(Pop) %>%
 ### Boxplot of ancestry by stock -> loop
 ```{r echo=FALSE}
 sort.tbl <- with(pop_plink, pop_plink[order(pop_plink$Pop),])
-amelplot <- function(popname, fill_col){
-  p <- ggplot(sort.tbl, aes(x=Pop, y={{popname}})) + geom_boxplot(fill=fill_col, color="black") + coord_cartesian(ylim=c(0,1))
-  p + ggtitle("Ancestry by Management") + xlab("Management") + ylab("Proportion")
-  p + theme(text=element_text(size=15)) + theme_bw()
-}
 
-
-amelplot(M, '#CD9600')
-#yellow is #CD9600
-#red is #FF0000
+amel_adplot(A, '#C41E3A')
+amel_adplot(C, '#D4AF37')
+amel_adplot(M, '#808080')
 ```
 
-### Statistical significance -> loop
+### Statistical significance
 ```{r}
-
-mg_name <- unique(pop_plink$Management)
-pop_name <- c("A", "C", "M")
-
-for(i in 1:length(mg_name)){
-  print(i)
-  for(x in 1:length(pop_name)){
-    c_aov <- aov(pop_plink$x~pop_plink$i, data=pop_plink)
-    TukeyHSD(c_aov)
-  }
-}
-
-
-pop_name <- data.frame(c("A", "C", "M"))
-for(i in 1:length(pop_name)){
-    c_aov <- aov(pop_plink$i~pop_plink$Feral, data=pop_plink)
-    TukeyHSD(c_aov)
-    print(c_aov)
-  }
-
-
-for(i in 1:length(pop_name)){ 
-  test <- pop_name[i]
-  c_aov <- aov(pop_plink$test~pop_plink$Feral, data=pop_plink) 
-}
-
-
-
+  x <- aov(pop_plink$A~pop_plink$Management, data=pop_plink)
   x <- aov(pop_plink$C~pop_plink$Management, data=pop_plink)
   TukeyHSD(x)
   x <- aov(pop_plink$M~pop_plink$Management, data=pop_plink)
@@ -108,7 +75,7 @@ The dotted line represented in the figure represents the ancestry contribution a
 
 ```{r echo=FALSE}
 anc.plot <- barplot(t(as.matrix(plink3)), 
-                col=c("red", "black", "yellow"), 
+                col=c("#C41E3A", "#000000", "#D4AF37"), 
                 xlab="Sample", las=2,
                 ylab="Ancestry", 
                 legend=c("A", "M", "C"),

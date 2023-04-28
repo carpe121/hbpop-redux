@@ -27,6 +27,10 @@ library(reshape2)
 ## Step 1: Defining Variables
 ```{r eval=FALSE}
 df <- amel_colnames(pop2names, popool2_fst)
+
+#df <- read.table("all2.fst", header=T)
+#df <- data.frame(apply(df, 2, function(x) as.numeric(gsub('.*_', '', x))))
+#df <- df[-c(1:5)]
 ```
 
 ## Step 2: Avg. FST per Population
@@ -35,8 +39,8 @@ mean.n0 excludes zeroes.
 ```{r}
 mean <- colMeans(df[[1]])
 mean.n0 <- apply(df,2,function(x) mean(x[x>0]))
-df_means <- cbind(mean, mean.n0, df[[2]])
-colnames(df_means) <- c("FST", "FST_n0", "comp")
+df_means <- cbind(mean, mean.n0, test)
+colnames(df_means) <- c("FST", "FST_n0", "comp", "stock")
 df_means
 ```
 
@@ -44,31 +48,27 @@ df_means
 
 ```{r}
 df_means <- subset(df_means, select=-c(1))
-df_means$stock <- rownames(df_means)
 rownames(df_means) <- NULL
 df_means2 <- df_means[order(df_means$FST_n0),]
-df_fstag <- aggregate(df_means2$FST_n0, by=list(df_means2$comp), function(x) mean(x, na.rm=TRUE))
-colnames(df_fstag) <- c("Comparison", "FST")
+df_agman <- df_means2 %>% group_by(comp) %>%
+  summarize(FST=mean(FST_n0), sd=sd(FST_n0))
 ```
 
 ### Figure
 ```{r echo=FALSE}
-ampop_avfst <- ggplot(data=df_fstag, aes(x=Comparison, y=FST, fill=Comparison)) + 
+ampop_avfst <- ggplot(data=df_agman, aes(x=comp, y=FST, color=comp)) + 
   geom_bar(stat="identity") + 
-  theme_classic() +
   theme(legend.position="none",
         axis.title.x=element_text(color="black", size=15),
         axis.title.y=element_text(color="black", size=15)) +
   ylab("Average FST") + xlab("Stock") + 
   ggtitle("Average FST by Comparison") + theme(plot.title=element_text(hjust=0.5))
-ampop_avfst <- ampop_avfst + scale_color_manual(values=c("#4D1434", "#903163", "#969FA7"))
 ampop_avfst
 ```
 
 ### AOV
 ```{r}
-df_means <- df_means[-grep("Ref", df$Field1),]
-df_aov <- aov(df_means$FST_n0~df_means$comp)
+df_aov <- aov(df_means2$FST_n0~df_means2$comp)
 summary(df_aov)
 df_tukey <- TukeyHSD(df_aov)
 plot(df_tukey, las=1)
@@ -80,7 +80,7 @@ mean.n0 <- data.frame(apply(df,2,function(x) mean(x[x>0])))
 mean.n0$names <- rownames(mean.n0)
 rownames(mean.n0) <- NULL
 colnames(mean.n0) <- c("FST", "Comp")
-mean.n0$Field1 <- gsub('[.].*','', mean.n0$Comp)
+mean.n0$Field1 <- gsub('[.].*','', mean.n0$Comp) #order alphabetical
 mean.n0$Field2 <- gsub('.*[.]','', mean.n0$Comp)
 mean.n0_2 <- subset(mean.n0, select=-c(2))
 
