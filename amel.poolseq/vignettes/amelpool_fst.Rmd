@@ -29,17 +29,24 @@ library(reshape2)
 df <- amel_colnames(pop2names, popool2_fst)
 
 #df <- read.table("all2.fst", header=T)
-#df <- data.frame(apply(df, 2, function(x) as.numeric(gsub('.*_', '', x))))
-#df <- df[-c(1:5)]
+#rm_chars <- function(x){
+#  as.numeric(gsub('.*_', '', x))
+#}
+#test <- df %>% mutate(across(6:ncol(df), rm_chars))
+
+
+#df_stats <- read.table("comp", header=F)
+
+
 ```
 
 ## Step 2: Avg. FST per Population
 mean.n0 excludes zeroes.
 
 ```{r}
-mean <- colMeans(df[[1]])
-mean.n0 <- apply(df,2,function(x) mean(x[x>0]))
-df_means <- cbind(mean, mean.n0, test)
+mean <- colMeans(df1)
+mean.n0 <- apply(df1,2,function(x) mean(x[x>0]))
+df_means <- cbind(mean, mean.n0, df_stats)
 colnames(df_means) <- c("FST", "FST_n0", "comp", "stock")
 df_means
 ```
@@ -56,9 +63,7 @@ df_agman <- df_means2 %>% group_by(comp) %>%
 
 ### Figure
 ```{r echo=FALSE}
-ampop_avfst <- ggplot(data=df_agman, aes(x=comp, y=FST, color=comp)) + 
-  geom_bar(stat="identity") + 
-  theme(legend.position="none",
+ampop_avfst <- ggplot(df_means2, aes(x=comp, y=FST_n0, color=comp)) + geom_boxplot() + theme(legend.position="none",
         axis.title.x=element_text(color="black", size=15),
         axis.title.y=element_text(color="black", size=15)) +
   ylab("Average FST") + xlab("Stock") + 
@@ -76,25 +81,25 @@ plot(df_tukey, las=1)
 
 ## Fst Heatmap
 ```{r}
-mean.n0 <- data.frame(apply(df,2,function(x) mean(x[x>0])))
-mean.n0$names <- rownames(mean.n0)
-rownames(mean.n0) <- NULL
-colnames(mean.n0) <- c("FST", "Comp")
-mean.n0$Field1 <- gsub('[.].*','', mean.n0$Comp) #order alphabetical
-mean.n0$Field2 <- gsub('.*[.]','', mean.n0$Comp)
-mean.n0_2 <- subset(mean.n0, select=-c(2))
 
-ggplot(mean.n0_2, aes(Field1, Field2, fill=FST)) + geom_tile() + 
-  geom_text(aes(label=sprintf("%.3f", FST)), color="white", size=4) +
+df_means %>% mutate(
+  Field1 = gsub('[.].*','', df_means$stock), Field2 = gsub('.*[.]','', df_means$stock))
+#.keep="unused" ?
+
+df_hm <- subset(df_means, select=-c(3))
+
+ggplot(df_hm, aes(Field1, Field2, fill=FST_n0)) + geom_tile() + 
+  geom_text(aes(label=sprintf("%.3f", FST_n0)), color="white", size=4) +
   labs(x=NULL, y=NULL) +
   coord_fixed() + theme_bw()
 ```
 
 ## Manhattan plot
-
 The first line of code removes unclassified sections of the honey bee genome for easier plotting.
+
 ```{r}
 ampop_mhdf <- df[-grep("NW_", df$RefContig),]
+
 ampop_mhdf <- ampop_mhdf %>%
   group_by(RefContig) %>%
   summarize(chr_len=max(WindowPos)) %>%
@@ -109,7 +114,7 @@ axisdf = ampop_mhdf %>% group_by(RefContig) %>% summarize(center=( max(BPcum) + 
 Now that the dataframe has been assembled, the Manhattan plot can be constructed.
 
 ```{r}
-ampop_manplot <- ggplot(ampop_mhdf, aes(x=BPcum, y=df4[,7])) +
+ampop_manplot <- ggplot(ampop_mhdf, aes(x=BPcum, y=ampop_mhdf[,7])) +
   geom_point( aes(color=as.factor(RefContig)), alpha=0.8, size=1.3) +
   scale_color_manual(values = rep(c("grey", "skyblue"), 70 )) +
   scale_x_continuous( label = axisdf$RefContig, breaks= axisdf$center ) +

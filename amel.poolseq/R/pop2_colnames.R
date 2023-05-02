@@ -23,14 +23,33 @@ amel_colnames <- function(popnames, popool_fst) {
 	return(out)
 }
 
-
-amel_colnames <- function(popnames, popool_fst, nco) {
-	popool_fst2 <- popool_fst[,grepl("=", popool_fst)]
-	popool_fst2 <- data.frame(apply(popool_fst2, 2, function(x) as.numeric(gsub('.*=', '', x))))
-	pop2_samp <- data.frame(t(combn(popnames[,c(nco)],2)))
+amel_colnames <- function(popnames, popool_fst) {
+	rmeq <- function(x){
+		as.numeric(gsub('.*=', '', x))
+	}
+	pop2 <- popool_fst %>% mutate(across(6:ncol(popool_fst), rmeq))
+	pop2_samp <- data.frame(t(combn(popnames[,1], 2)))
 	samp_name <- paste(pop2_samp$X1, pop2_samp$X2, sep='.')
-	colnames(popool_fst2) <- samp_name
+
+
+
+	colnames(pop2) <- samp_name
+	return(pop2)
 }
 
+pop2 %>% select(1:5) %>%
+rename(
+	RefContig = 1,
+	WindowPos = 2,
+	SNPs = 3,
+	CovFrac = 4,
+	AvMinCov = 5
+	) %>% select(6:ncol(pop2)) %>%
+rename(
+
+	)
 
 
+pop2 %>% select(6:ncol(pop2)) %>%
+rename_with(samp_name
+	)
