@@ -22,26 +22,26 @@ library(pcadapt)
 # PCA
 
 ## File Organization
-Read in plink_2.bed (plink file created by ADMIXTURE) and pca_rn.txt (data.frame single column file that has stock corresponding to the row -> change to popnames).
+Read in plink_2.bed (plink file created by ADMIXTURE) and pca_rn.txt (data.frame with two columns: population and management).
 
 ```{r}
-  file <- read.pcadapt("plink_2.bed", type="bed")
-  rn <- read.table("pca_rn.txt", header=F)
-  x <- pcadapt(input=file, K=20)
-  plot1 <- plot(x, option="screeplot")
+amel_pl <- read.pcadapt("plink_2.bed", type="bed")
+popnames <- read.table("pca_rn.txt", header=T)
+popnames <- popnames[-c(66:68),]
 ```
 
-## Data Organization
-poplist is a list of the samples and their population, in the order they are listed in the plink file.
+## Screeplot
 ```{r}
-  poplist <- c(rep("PAFeral", 2), rep("PAManaged", 1), rep("PAFeral", 1), rep("PAManaged", 2), rep("PAFeral", 1), rep("PAManaged", 1), rep("Cali",5), rep("PAFeral",1), rep("PAManaged",1), rep("PAFeral",1), rep("PAManaged",1), rep("KYFeral",10), rep("PAFeral", 4), rep("NCFeral",5), rep("PurdueMB",5), rep("RussianIN",9), rep("Sask",1), rep("PAManaged",1), rep("Sask",2), rep("Texas",7), rep("PAFeral", 3), rep("PAManaged", 1))
-  plot2 <- plot(x, option="scores", pop=unique(popnames[,2]))
-  df <- subset(data.frame(x$scores), select=c(1,2)) #pulls out the first two PCs
-  df$Stock <- rn$V1
+amel_pca <- pcadapt(input=amel_pl, K=20)
+plot(amel_pca, option="screeplot")
 ```
 
 ## Plot PCA
 ```{r echo=FALSE}
+df <- subset(data.frame(amel_pca$scores), select=c(1,2)) 
+  #pulls out the first two PCs
+df$Stock <- popnames$Pop  
+
 ggplot(df, aes(x=X1, y=X2, shape=Stock, color=Stock)) + 
   geom_point(size=5) +
   scale_shape_manual(values=c(17,16,16,16,17,17,17,17,17)) +

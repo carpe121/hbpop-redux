@@ -21,15 +21,18 @@ evans <- read.csv("evans.tsv", sep="\t", header=T)
 harp <- read_excel("evz018_supp/TableS3.xlsx", range=cell.cols("D6:D78"))
 	#harp <- read.csv("harp.tsv", sep="\t", header=T)
 
-colnames(brut) <- brut[1,]
-brut <- brut[-c(1,2),]
-brut <- brut[,c(1:3)]
-colnames(brut) <- c("Gene.Name", "Pathway", "Gene.ID")
+brut1 <- brut %>% filter(!row_number() %in% c(1,2)) %>%
+	select(1:3) %>%
+	rename(
+		Gene.Name=1,
+		Pathway=2,
+		Gene.ID=3)
 
-brut_ev <- rbind(brut, evans) %>% left_join(gb_ncbi_conv, by=join_by(Gene.ID==Transcript))
+brut_ev <- bind_rows(brut1, evans) %>%
+	left_join(gb_ncbi_conv, by=join_by(Gene.ID==Transcript)) %>%
+	select(!GB)
 
 #brut contains GBs in Gene.ID col -> swap col values and check for transcript matches
-brut_ev3 <- brut_ev[-c(5)]
 brut_evt <- brut_ev3[grep("GB", brut_ev3$Gene.ID),]
 brut_ev3 <- brut_ev3[-grep("GB", brut_ev3$Gene.ID),]
 

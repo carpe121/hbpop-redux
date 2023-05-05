@@ -20,42 +20,54 @@ library(ggplot2)
 library(dplyr)
 library(Imap)
 library(reshape2)
+library(utils)
 ```
 
 # Vignette for FST figures
 
-## Step 1: Defining Variables
+## Define Variables
+### From Raw
 ```{r eval=FALSE}
 df <- amel_colnames(pop2names, popool2_fst)
 
-#df <- read.table("all2.fst", header=T)
-#rm_chars <- function(x){
-#  as.numeric(gsub('.*_', '', x))
-#}
-#test <- df %>% mutate(across(6:ncol(df), rm_chars))
+samp_pop <- function(popnames)
+  pop2_samp <- data.frame(t(combn(popnames[,1],2)))
+  samp_name <- paste(pop2_samp$X1, pop2_samp$X2, sep='.')
+  pop2_pop <- data.frame(t(combn(popnames[,2],2)))
+  pop_name <- paste(pop2_pop$X1, pop2_pop$X2, sep='')
+  amel_fst_df <- data.frame(cbind(samp_name, pop_name))
+}
 
+df_stats <- samp_pop(popnames)
+````
 
-#df_stats <- read.table("comp", header=F)
+### From Cluster
+```
+df <- read.table("all2.fst", header=T)
+rm_chars <- function(x){
+  as.numeric(gsub('.*_', '', x))
+}
+df <- df %>% mutate(across(6:ncol(df), rm_chars))
 
-
+df_stats <- read.table("comp", header=F)
+df_stats <- df_stats[,c(2,1)]
 ```
 
-## Step 2: Avg. FST per Population
+## Avg. FST per population
 mean.n0 excludes zeroes.
 
 ```{r}
-mean <- colMeans(df1)
-mean.n0 <- apply(df1,2,function(x) mean(x[x>0]))
+mean <- colMeans(df[6:ncol(df)])
+mean.n0 <- apply(df[6:ncol(df)],2,function(x) mean(x[x>0]))
 df_means <- cbind(mean, mean.n0, df_stats)
-colnames(df_means) <- c("FST", "FST_n0", "comp", "stock")
-df_means
+colnames(df_means) <- c("FST", "FST_n0", "stock", "comp")
+rownames(df_means) <- NULL
 ```
 
-## Step 3: Aggregate mean FST by comparison class and plot-----
+## Aggregate avg. FST by management
 
 ```{r}
 df_means <- subset(df_means, select=-c(1))
-rownames(df_means) <- NULL
 df_means2 <- df_means[order(df_means$FST_n0),]
 df_agman <- df_means2 %>% group_by(comp) %>%
   summarize(FST=mean(FST_n0), sd=sd(FST_n0))
@@ -66,7 +78,7 @@ df_agman <- df_means2 %>% group_by(comp) %>%
 ampop_avfst <- ggplot(df_means2, aes(x=comp, y=FST_n0, color=comp)) + geom_boxplot() + theme(legend.position="none",
         axis.title.x=element_text(color="black", size=15),
         axis.title.y=element_text(color="black", size=15)) +
-  ylab("Average FST") + xlab("Stock") + 
+  ylab("Average FST") + xlab("Management") + 
   ggtitle("Average FST by Comparison") + theme(plot.title=element_text(hjust=0.5))
 ampop_avfst
 ```
@@ -79,16 +91,17 @@ df_tukey <- TukeyHSD(df_aov)
 plot(df_tukey, las=1)
 ```
 
-## Fst Heatmap
+## Fst heatmap by stock
 ```{r}
 
-df_means %>% mutate(
-  Field1 = gsub('[.].*','', df_means$stock), Field2 = gsub('.*[.]','', df_means$stock))
-#.keep="unused" ?
+df_hm <- df_means %>% mutate(
+  Field1 = gsub('[.].*','', df_means$stock), 
+  Field2 = gsub('.*[.]','', df_means$stock)
+  ) %>% select(!(stock))
 
-df_hm <- subset(df_means, select=-c(3))
+##note: code to reorder columns by name (alphabetical)
 
-ggplot(df_hm, aes(Field1, Field2, fill=FST_n0)) + geom_tile() + 
+ggplot(df_hm, aes(Field1, Field2, fill=FST_n0)) + geom_tile() +
   geom_text(aes(label=sprintf("%.3f", FST_n0)), color="white", size=4) +
   labs(x=NULL, y=NULL) +
   coord_fixed() + theme_bw()

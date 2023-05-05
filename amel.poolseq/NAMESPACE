@@ -2,12 +2,9 @@
 
 export(amel_adplot)
 export(amel_colnames)
-export(hbpop_bed)
 export(hbpop_snpdf)
 export(hbpop_snpsing)
 import(dplyr)
 import(ggplot2)
-importFrom(reshape2,melt)
-importFrom(stats,quantile)
 importFrom(stats,t.test)
 importFrom(utils,combn)
