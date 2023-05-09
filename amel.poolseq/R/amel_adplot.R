@@ -8,7 +8,9 @@
 #' @export
 
 
-amel_adplot <- function(popname, fill_col){
-  p <- ggplot(sort.tbl, aes(x=Pop, y={{popname}}), environment=environment()) + geom_boxplot(fill=fill_col, color="black") + coord_cartesian(ylim=c(0,1)) + ggtitle("Ancestry by Management") + xlab("Management") + ylab("Proportion")
+amel_adplot <- function(popname, fill_col, tbl){
+  p <- ggplot(tbl, aes(x=Pop, y={{popname}}), environment=environment()) + 
+    geom_boxplot(fill=fill_col, color="black") + coord_cartesian(ylim=c(0,1)) + 
+    ggtitle("Ancestry by Management") + xlab("Management") + ylab("Proportion")
   p + theme_bw()
 }

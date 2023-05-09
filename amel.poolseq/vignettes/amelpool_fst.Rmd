@@ -18,7 +18,6 @@ knitr::opts_chunk$set(
 library(amel.poolseq)
 library(ggplot2)
 library(dplyr)
-library(Imap)
 library(reshape2)
 library(utils)
 ```
@@ -141,79 +140,4 @@ ampop_manplot <- ggplot(ampop_mhdf, aes(x=BPcum, y=ampop_mhdf[,7])) +
   )
 
 ampop_manplot + facet_wrap(~RefContig, scales="free")
-```
-
-## FST by Geographic Distance
-### https://eurekastatistics.com/calculating-a-distance-matrix-for-geographic-points-using-r/
-
-I looked to see if there was a relationship between FST and geographic distance. I relied heavily on eurekastatistics functions.
-
-```{r}
-ReplaceLowerOrUpperTriangle <- function(m, triangle.to.replace){
-  if (nrow(m) !=ncol(m)) stop("Supplied matrix must be square.")
-  if (tolower(triangle.to.replace)=="lower") tri <- lower.tri(m)
-  else if (tolower(triangle.to.replace)=="upper") tri <- upper.tri(m)
-  else stop("triangle.to.replace must be set to 'lower' or 'upper'.")
-  m[tri] <- t(m)[tri]
-  return(m)
-}
-
-GeoDistanceInMetersMatrix <- function(df.geopoints) {
-  GeoDistanceInMeters <- function(g1, g2) {
-    DistM <- function(g1, g2) {
-      require("Imap")
-      return(ifelse(g1$index > g2$index, 0, gdist(lat.1=g1$lat, lon.1=g1$lon, lat.2=g2$lat, lon.2=g2$lon, units="m")))
-    }
-    return(mapply(DistM, g1, g2))
-  }
-  n.geopoints <- nrow(df.geopoints)
-  df.geopoints$index <- 1:n.geopoints
-  list.geopoints <- by(df.geopoints[,c("index", "lat", "lon")], 1:n.geopoints, function(x){return(list(x))})
-  mat.distances <- ReplaceLowerOrUpperTriangle(outer(list.geopoints, list.geopoints, GeoDistanceInMeters), "lower")
-  
-  rownames(mat.distances) <- df.geopoints$name
-  colnames(mat.distances) <- df.geopoints$name
-  
-  return(mat.distances)
-  
-}
-```
-
-Sorry, but I will not be posting the actual coordinates of the colonies on a public GitHub...
-
-```{r}
-col.loc <- read.csv("pa_coords", sep="\t", header=T)
-distance.m <- GeoDistanceInMetersMatrix(col.loc)
-colnames(distance.m) <- rbind(col.loc$index)
-row.names(distance.m) <- cbind(col.loc$index)
-y <- melt(distance.m)
-
-y$value <- replace(y$value, which(y$Var1==y$Var2),NA) 
-z <- na.omit(y)
-
-z$file<- paste(z$Var1,z$Var2,sep='.')
-a <- subset(z, select=-c(1,2))
-b <- merge(a, temp, by="file")
-```
-
-Read in Pennsylvania FST.
-
-```{r}
-pa2_short <- read.csv("pa2_short.fst", header=T)
-df <- amel_colnames(pa2names, pa2_short)
-
-mean <- colMeans(df) #calculate column means
-mean.n0 <- apply(df,2,function(x) mean(x[x>0]))
-temp <- cbind(mean, mean.n0)
-colnames(temp) <- c("FST", "FST_n0")
-temp <- subset(temp, select=-c(1))
-temp$file <- colnames(temp)
-```
-
-Melt dataframe to make chart.
-
-```{r eval=FALSE}
-df4$Comb <- paste(df4$RefContig, df4$WindowPos)
-samp_names <- unique(df4$Field1)
-df5 <- melt(df, id.vars="Comb", measure.vars=dput(as.character(samp_names)))
 ```

@@ -4,7 +4,7 @@
 \alias{amel_adplot}
 \title{generate ggplot boxplot for ADMIXTURE data}
 \usage{
-amel_adplot(popname, fill_col)
+amel_adplot(popname, fill_col, tbl)
 }
 \arguments{
 \item{popname}{string that can be 'A', 'C', or 'M'}

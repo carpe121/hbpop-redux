@@ -4,14 +4,18 @@
 #' @returns data.frame
 #' @import ggplot2
 #' @importFrom stats t.test
-#' @examples tbd
 #' @export
 
 hbpop_snpsing <- function(snp_gen_out, gene) {
-  snpgen <- snp_gen_out[which(snp_gen_out$GBold=='gene'),]
+  snpgen <- snp_gen_out[which(snp_gen_out$GBold==gene),]
   snpgen_tt <- t.test(snpgen$NS~snpgen$Field1)
   snpgen_ttp <- snpgen_tt$p.value
-  snpgen_plot <- ggplot(snpgen_tt, aes(x=Field1, y=NS, fill=Field1)) + geom_boxplot(outlier.color="black", notch=FALSE) + labs(x="Management", y="NS") + theme_classic() + theme(legend.position="none", axis.title.x=element_text(color="black", size=12), axis.text.y=element_text(color="black", size=12)) + ylab("𝜋N/𝜋S") + xlab("Management Practice") + ggtitle("Dscam")
+  snpgen_plot <- ggplot(snpgen_tt, aes(x=Field1, y=NS, fill=Field1)) + 
+    geom_boxplot(outlier.color="black", notch=FALSE) + 
+    labs(x="Management", y="NS") + theme_classic() + 
+    theme(legend.position="none", 
+      axis.title.x=element_text(color="black", size=12), axis.text.y=element_text(color="black", size=12)) + 
+    ylab("𝜋N/𝜋S") + xlab("Management Practice") + ggtitle(sprintf("%f", gene))
   out <- list(snpgen_tt, snpgen_ttp, snpgen_plot)
   return(out)
 }

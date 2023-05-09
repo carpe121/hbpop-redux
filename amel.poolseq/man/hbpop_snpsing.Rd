@@ -15,6 +15,3 @@ data.frame
 \description{
 analyzes individual genes for differences in genetic diversity
 }
-\examples{
-tbd
-}

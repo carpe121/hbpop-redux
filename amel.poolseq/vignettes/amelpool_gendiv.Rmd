@@ -138,31 +138,4 @@ hbpop_snpsing function allows you to look at differences in genetic diversity be
 hbpop_snpsing(GenDiv, GB44159)
 ```
 
-## Genetic Diversity vs. Coverage
-
-Depths output by samtools...include pre-trim variables.
-
-```{r}
-depth.samp <- read.csv("dp.csv", fill=T, header=T)
-table3 <- merge(depth.samp, table.s.sd, by="Sample.Name")
-x<-new.table2[,c('Field2', 'sample')]
-names(table3)[1] <- 'sample'
-y<-merge(x, table3, by = 'sample')
-y<-y[!duplicated(y),]
-dep.pi <- y
-
-y <- lm(data=dep.pi, Mean_piS ~ Depth + Field2)
-summary(y)
-resid <- residuals(y)
-dep.pi$resid <- resid
-boxplot(dep.pi$resid~dep.pi$Field2)
-abline(h=0)
-
-depth.plot <- ggplot(dep.pi, aes(x=Depth, y=Mean_piS)) +
-  geom_point(cex=3, pch=19) +
-  geom_smooth(method='lm') + 
-  ylab("Average piS") + xlab("Sequencing Depth") + ggtitle("Sequencing Depth vs. Average Genome-wide Genetic Diversity")
-depth.plot
-```
-
 
