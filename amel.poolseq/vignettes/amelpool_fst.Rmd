@@ -98,12 +98,19 @@ df_hm <- df_means %>% mutate(
   Field2 = gsub('.*[.]','', df_means$stock)
   ) %>% select(!(stock))
 
+df_hm2 <- df_hm %>% relocate(Field2, .before=Field1) %>%
+  rename(
+    Field1=3,
+    Field2=4) %>%
+  bind_rows(df_hm)
+
 ##note: code to reorder columns by name (alphabetical)
 
-ggplot(df_hm, aes(Field1, Field2, fill=FST_n0)) + geom_tile() +
+ggplot(df_hm2, aes(Field1, Field2, fill=FST_n0)) + geom_tile() +
+  scale_fill_gradient(low="#D4AF37", high="black") +
   geom_text(aes(label=sprintf("%.3f", FST_n0)), color="white", size=4) +
   labs(x=NULL, y=NULL) +
-  coord_fixed() + theme_bw()
+  coord_fixed()
 ```
 
 ## Manhattan plot
