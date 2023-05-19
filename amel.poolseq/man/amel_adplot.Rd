@@ -10,13 +10,12 @@ amel_adplot(popname, fill_col, tbl)
 \item{popname}{string that can be 'A', 'C', or 'M'}
 
 \item{fill_col}{hexcode '#000000'}
+
+\item{tbl}{data.table produced by ADMIXTURE}
 }
 \value{
 figure
 }
 \description{
 generate ggplot boxplot for ADMIXTURE data
-}
-\examples{
-set later 
 }

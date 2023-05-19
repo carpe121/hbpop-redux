@@ -1,10 +1,10 @@
 #HBPOP2022 ADMIXTURE Plot
 #' generate ggplot boxplot for ADMIXTURE data
+#' @param tbl data.table produced by ADMIXTURE
 #' @param popname string that can be 'A', 'C', or 'M'
 #' @param fill_col hexcode '#000000'
 #' @import ggplot2 
 #' @return figure
-#' @examples set later 
 #' @export
 
 

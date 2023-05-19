@@ -23,12 +23,28 @@ library(ggplot2)
 
 # Genetic Diversity Tables and Figures
 ## From raw
+```{r}
 df <- hbpop_snpdf(GenDiv, popnames)
-
+```
 
 ## From cluster
 ```{r}
 df <- read.table("GenDiv", header=T)
+gb_gbo <- read.table("GB_GBold", header=T)
+gb_ncbi <- read.table("GB_to_NCBI", header=T, fill=T)
+
+library(wrapr)
+
+colnames(gb_ncbi) <- c("Transcript", "Gene")
+gb_gbo$comb <- gb_gbo$GBold %?% gb_gbo$GB 
+gb_ncbi_conv <- full_join(gb_gbo, gb_ncbi, join_by(comb==Gene), multiple="all") %>%
+ select(!GBold) %>%
+ distinct(Transcript, .keep_all=TRUE)
+
+df <- df %>% select(!(c(GBold, GB))) %>% 
+  left_join(gb_ncbi_conv, by=c("product" = "Transcript")) %>%
+  select(!(c(GB)))
+
 ```
 
 ## Avg. NS by sample
@@ -57,15 +73,15 @@ ggplot(gd_plot, aes(x=Field2, y=NS, color=Field2)) +
 
 ## Significance testing
 ```{r}
-aov <- aov(piS~Field2, data=df)
+aov <- aov(piS~Field2, data=gd_plot)
 summary(aov)
 tuk <- TukeyHSD(aov)
 plot(tuk, las=2, col="red", cex.lab=0.5)
 ```
 
-## Highest % value SNPs
+## SNPs exhibiting greatest directional selection
 ```{r}
-n <- 25 #for top 25%
+n <- 25 #for top 25% of values
 top25 <- df[df$NS > quantile(df$NS,prob=1-n/100),]
 ```
 
@@ -84,7 +100,6 @@ piS.plot <- ggplot(imm_dt, aes(x=Field2, y=NS, color=Field2)) +
                           axis.text.y = element_text(color="black", size=10)) +
   ylab("piS") + xlab("Stock") + geom_hline(yintercept=c(0.00530899), lty=3) +
   ggtitle("piS by Stock")
-
 ```
 
 # Significant differences in feral and managed pop genetic diversity
@@ -133,9 +148,10 @@ imm <- na.omit(imm)
 ```
 
 ### Look at single genes
-hbpop_snpsing function allows you to look at differences in genetic diversity between specific genes. This example uses DSCAM.
+`hbpop_snpsing` allows you to look at differences in genetic diversity between specific genes. This example uses DSCAM.
+
 ```{r}
-hbpop_snpsing(GenDiv, GB44159)
+hbpop_snpsing(gd_plot, 'GB44159')
 ```
 
 

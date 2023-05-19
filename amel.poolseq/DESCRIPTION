@@ -1,10 +1,10 @@
 Package: amel.poolseq
 Title: Apis mellifera Pooled Sequencing Package
-Version: 1.0.12
+Version: 1.0.13
 Authors@R: 
     person("Madeline", "Carpenter", , "remcr@channing.harvard.edu", role = c("aut", "cre"),
            comment = c(ORCID = "0000000"))
-Description: What the package does (one paragraph).
+Description: The package amel.poolseq recreates the figures and conclusions detailed in Population Genomics of Honey Bees in the United States (Carpenter & Harpur, in prep).
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -12,13 +12,11 @@ RoxygenNote: 7.2.3
 Imports: 
     dplyr,
     ggplot2,
-    reshape2,
     utils,
-    wrapr
 Suggests: 
     knitr,
     rmarkdown
 VignetteBuilder: knitr
 Depends: 
-    R (>= 2.10)
+    R (>= 3.0)
 LazyData: true

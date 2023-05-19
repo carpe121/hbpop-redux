@@ -9,10 +9,10 @@ amel_colnames(popnames, popool_fst)
 \arguments{
 \item{popnames}{list of sample names IN THE ORDER THEY WERE ADDED TO MPILEUP and their population}
 
-\item{popool_fst}{data.frame .fst output created by popoolation2 fst-sliding.pl}
+\item{popool_fst}{dataframe .fst output created by popoolation2 fst-sliding.pl}
 }
 \value{
-data.frame with samples as col names and '#:#=' removed from values
+dataframe with samples as col names and '#:#=' removed from values
 }
 \description{
 removes non-fst columns and numeric population colnames from fst estimates; sets colnames to population names
