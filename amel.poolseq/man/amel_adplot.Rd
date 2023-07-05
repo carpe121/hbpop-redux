@@ -4,14 +4,14 @@
 \alias{amel_adplot}
 \title{generate ggplot boxplot for ADMIXTURE data}
 \usage{
-amel_adplot(popname, fill_col, tbl)
+amel_adplot(popname = "C", popdiv)
 }
 \arguments{
-\item{popname}{string that can be 'A', 'C', or 'M'}
+\item{popname}{string that can be 'A', 'C', or 'M'; default=C}
 
-\item{fill_col}{hexcode '#000000'}
+\item{popdiv}{character ; "Management" or "Pop"}
 
-\item{tbl}{data.table produced by ADMIXTURE}
+\item{sort.tbl}{data.table produced by ADMIXTURE}
 }
 \value{
 figure

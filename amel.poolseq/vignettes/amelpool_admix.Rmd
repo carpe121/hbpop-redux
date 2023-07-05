@@ -52,29 +52,34 @@ hbstock_admix <- pop_plink %>% group_by(Pop) %>%
     avgM=mean(M), sdM=sd(M))
 ```
 
-### Boxplot of ancestry by stock -> loop
+### Figure 4: Boxplot of ancestry by stock
 ```{r echo=FALSE}
 sort.tbl <- with(pop_plink, pop_plink[order(pop_plink$Pop),])
 
-amel_adplot(A, '#C41E3A')
-amel_adplot(C, '#D4AF37')
-amel_adplot(M, '#808080')
+amel_adplot(popname="A", Management)
+amel_adplot(popname="C", Management)
+amel_adplot(popname="M", Management)
+
 ```
 
 ### Statistical significance
 ```{r}
-  x <- aov(pop_plink$A~pop_plink$Management, data=pop_plink)
-  x <- aov(pop_plink$C~pop_plink$Management, data=pop_plink)
-  TukeyHSD(x)
-  x <- aov(pop_plink$M~pop_plink$Management, data=pop_plink)
+  a_aov <- aov(pop_plink$A~pop_plink$Management, data=pop_plink)
+  TukeyHSD(a_aov)
+  c_aov <- aov(pop_plink$C~pop_plink$Management, data=pop_plink)
+  TukeyHSD(c_aov)
+  m_aov <- aov(pop_plink$M~pop_plink$Management, data=pop_plink)
+  TukeyHSD(m_aov)
 ```
 
-## Produce Figure X: Ancestry by Pooled Sample
+## Figure 5: Ancestry by Pooled Sample
 
 The dotted line represented in the figure represents the ancestry contribution at which AHB ancestry is reliably detectable.
 
 ```{r echo=FALSE}
-anc.plot <- barplot(t(as.matrix(plink3)), 
+sort.tbl2 <- sort.tbl %>% select(!c(Pop, Management))
+
+anc.plot <- barplot(t(as.matrix(sort.tbl2)), 
                 col=c("#C41E3A", "#000000", "#D4AF37"), 
                 xlab="Sample", las=2,
                 ylab="Ancestry", 
