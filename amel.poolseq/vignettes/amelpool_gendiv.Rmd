@@ -47,7 +47,7 @@ df <- df %>% select(!(c(GBold, GB))) %>%
 
 ```
 
-## Avg. NS by sample
+## Table 2: Avg. GenDiv by stock
 ```{r}
 gd_summ <- df %>% 
   group_by(Field2) %>% 
@@ -107,12 +107,12 @@ This loop looks at all the gene IDs and does a t-test between each pair of genes
 
 ```{r eval=FALSE}
 df2 <- df[-grep("Ref", df$Field1),]
-uniq.gene.id <- unique(df2$GBold)
+uniq.gene.id <- unique(df2$comb)
 gen.pval <- c()
 gene.list <- c()
 for(i in uniq.gene.id) {
-  print(i)
-  temp <- df2[which(df2$GBold==i),]
+  #print(i)
+  temp <- df2[which(df2$comb==i),]
   length1 <- length(temp$Field1[which(temp$Field1=='Feral')])
   length2 <- length(temp$Field1[which(temp$Field1!='Feral')])
   length3 <- length(unique(temp$samp))
@@ -125,18 +125,20 @@ for(i in uniq.gene.id) {
 
 all.pval.ns.gene <- data.frame(cbind(gene.list, as.numeric(as.character(gen.pval))))
 colnames(all.pval.ns.gene) <- c("gene", "pval") 
-all.pval.ns.gene <- all.pval.ns.gene[!(all.pval.ns.gene$pval=="NaN"),]
+pval_ns <- all.pval.ns.gene[!(all.pval.ns.gene$pval=="NaN"),]
+pval_ns$pval <- as.numeric(pval_ns$pval)
+
 ```
 ## *q* value
 *q*-value for each gene must also be calculated to correct for the false discovery rate because the previous loop executes many small probability calculations.
 
 ```{r}
-all.pval.ns.gene$q <- qvalue1(all.pval.ns.gene2$pval)$q 
-plot(-log10(all.pval.ns.gene$gene),all.pval.ns.gene$q)
+pval_ns$q <- qvalue1(pval_ns$pval)$q 
+plot(-log10(pval_ns$gene), pval_ns$q)
   abline(v=-log10(0.05))
   abline(h=0.05)
 
-pval <- all.pval.ns.gene[(all.pval.ns.gene$q<=0.05),]
+pval <- pval_ns[(pval_ns$q<=0.05),]
 #write.table(pval, "gen_div_pval", col.names=T, row.names=F, quote=F)
 ```
 
@@ -145,6 +147,48 @@ pval <- all.pval.ns.gene[(all.pval.ns.gene$q<=0.05),]
 imm_genes <- data(imm_genes)
 imm <- left_join(imm_genes, pval, by=c("GB"="gene"))
 imm <- na.omit(imm)
+```
+
+## If using cluster
+```{r}
+brut <- read.table("Brutscher_Imm_Gene_ID", header=T, fill=T, row.names=NULL, sep="\t")
+brut <- brut %>% left_join(gb_ncbi_conv, by=join_by(Gene.ID==Transcript)) %>% select(!GB)
+
+brut2 <- brut[grep("GB", brut$Gene.ID),]
+brut2 <- brut2 %>% 
+  relocate(comb, .before=Gene.ID) %>% 
+  rename(
+    Gene.ID=3,
+    comb=4) %>% 
+  left_join(gb_ncbi_conv, by=join_by(comb==comb)) %>%
+  select(!c(5,6))
+
+brut_ev2 <- brut[-grep("GB", brut$Gene.ID),]
+brut_ev3 <- rbind(brut_ev2, brut2)
+
+harp <- read.table("imm_genes", header=T)
+colnames(harp) <- c("GB", "Gene.Name", "Pathway")
+harp$Gene.Name <- NA
+harp$Pathway <- 'Hygiene'
+harp2 <- harp %>% 
+  left_join(gb_ncbi_conv, by=join_by(GB==comb), multiple="all") %>%
+  select(!GB.y) %>%
+  relocate(Gene.Name) %>%
+  relocate(Pathway, .after=Gene.Name) %>%
+  relocate(GB, .after=last_col()) %>%
+  rename(
+    Gene.ID=3,
+    comb=4
+    )
+
+br_ha <- rbind(brut_ev3, harp2)
+immgene_list <- br_ha[!duplicated(br_ev_ha$Gene.ID, incomparables=NA),]
+
+colnames(immgene_list) <- c("Gene.Name", "Pathway", "Transcript", "GBID")
+
+imm <- left_join(immgene_list, pval, by=c("GBID"="gene"))
+imm <- na.omit(imm)
+
 ```
 
 ### Look at single genes
