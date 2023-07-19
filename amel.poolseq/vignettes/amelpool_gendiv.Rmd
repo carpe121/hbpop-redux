@@ -56,23 +56,21 @@ gd_summ <- df %>%
       avgS=mean(piS), sdS=sd(piS),
       avgNS=mean(NS), sdNS=sd(NS)
       )
-```
 
-## Genome-wide NS by group
-```{r echo=FALSE}
-gd_plot <- df[-grep("Ref", df$Field1),]
-ggplot(gd_plot, aes(x=Field2, y=NS, color=Field2)) + 
-  geom_point(cex=1.5, pch=1.0, position = position_jitter(w=0.1, h=0)) +
-  geom_point(data=gd_summ, cex=2, pch=19, aes(x=Field2, y=avgNS), colour="black") +
-  theme_classic() + theme(legend.position = "none",
-                          axis.title.x = element_text(color="black", size=10),
-                          axis.text.y = element_text(color="black", size=10)) +
-  ylab("piS") + xlab("Stock") + geom_hline(yintercept=c(0.00530899), lty=3) +
-  ggtitle("piS by Stock")
+
+## Pearsons correlation to mitochondrial diversity
+```{r}
+mito_div <- data.frame(stock=c("Cali", "KYFeral", "NCFeral", "PAFeral", "PAManaged", "PurdueMB", "Russ", "Sask", "TX"),
+    hapdiv=as.numeric(c("0", "0.940", "0.950", "1.09", "1.03", "0", "0", "0", "0")))
+
+gd_pear <- gd_summ %>% select(c("avgS")) %>% bind_cols(mito_div)
+cor(gd_pear$hapdiv, gd_pear$avgS, method='pearson')
+
 ```
 
 ## Significance testing
 ```{r}
+gd_plot <- df[-grep("Ref", df$Field1),]
 aov <- aov(piS~Field2, data=gd_plot)
 summary(aov)
 tuk <- TukeyHSD(aov)

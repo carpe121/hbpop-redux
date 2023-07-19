@@ -24,6 +24,8 @@ library(pcadapt)
 ## File Organization
 Read in plink_2.bed (plink file created by ADMIXTURE) and pca_rn.txt (data.frame with two columns: population and management).
 
+Final command drops the reference populations.
+
 ```{r}
 amel_pl <- read.pcadapt("plink_2.bed", type="bed")
 popnames <- read.table("pca_rn.txt", header=T)

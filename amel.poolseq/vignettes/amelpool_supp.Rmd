@@ -45,7 +45,7 @@ depth.plot <- ggplot(dep.pi, aes(x=Depth, y=Mean_piS)) +
 depth.plot
 ```
 
-# FST by Geographic Distance
+# Supplemental Table 1: FST by Geographic Distance
 ```{r}
 library(geodist)
 library(reshape2)

@@ -41,7 +41,7 @@ df_stats <- samp_pop(popnames)
 ````
 
 ### From Cluster
-```
+```{r}
 df <- read.table("all2.fst", header=T)
 rm_chars <- function(x){
   as.numeric(gsub('.*_', '', x))
@@ -90,7 +90,7 @@ df_tukey <- TukeyHSD(df_aov)
 plot(df_tukey, las=1)
 ```
 
-## Fst heatmap by stock
+## FIGURE 7: Fst heatmap by stock
 ```{r}
 
 df_hm <- df_means %>% mutate(
@@ -103,8 +103,6 @@ df_hm2 <- df_hm %>% relocate(Field2, .before=Field1) %>%
     Field1=3,
     Field2=4) %>%
   bind_rows(df_hm)
-
-##note: code to reorder columns by name (alphabetical)
 
 ggplot(df_hm2, aes(Field1, Field2, fill=FST_n0)) + geom_tile() +
   scale_fill_gradient(low="#D4AF37", high="black") +
